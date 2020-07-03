@@ -1,9 +1,7 @@
 // eslint-disable-next-line no-unused-vars
-import { HttpRequest, HttpResponse, Controller, EmailValidator } from '../protocols'
+import { HttpRequest, HttpResponse, Controller, EmailValidator, AddAccount } from './signup-protocols'
 import { MissingParamError, InvalidParamError } from '../errors'
 import { badRequest, serverError } from '../helpers/http-helper'
-// eslint-disable-next-line no-unused-vars
-import { AddAccount } from '../../domain/usecases/add-account'
 
 export class SignUpController implements Controller {
   private readonly emailValidator: EmailValidator
