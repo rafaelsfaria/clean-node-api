@@ -1,10 +1,11 @@
 // eslint-disable-next-line no-unused-vars
-import { Encrypter } from './add-account-protocols'
+import { Encrypter, AccountModel, AddAccountModel, AddAccountRepository } from './add-account-protocols'
 import { DbAddAccount } from './add-account'
 
 interface SutTypes {
   sut: DbAddAccount,
-  encrypterStub: Encrypter
+  encrypterStub: Encrypter,
+  addAccountRepositoryStub: AddAccountRepository
 }
 
 const makeEncrypter = (): Encrypter => {
@@ -17,13 +18,30 @@ const makeEncrypter = (): Encrypter => {
   return encrypterStub
 }
 
+const makeAddAccountRepository = (): AddAccountRepository => {
+  class AddAccountRepositoryStub implements AddAccountRepository {
+    async add (account: AddAccountModel): Promise<AccountModel> {
+      const fakeAccount = {
+        ...account,
+        id: 'valid_id',
+        password: 'hashed_password'
+      }
+      return fakeAccount
+    }
+  }
+  const addAccountRepositoryStub = new AddAccountRepositoryStub()
+  return addAccountRepositoryStub
+}
+
 const makeSut = (): SutTypes => {
   const encrypterStub = makeEncrypter()
-  const sut = new DbAddAccount(encrypterStub)
+  const addAccountRepositoryStub = makeAddAccountRepository()
+  const sut = new DbAddAccount(encrypterStub, addAccountRepositoryStub)
 
   return {
     sut,
-    encrypterStub
+    encrypterStub,
+    addAccountRepositoryStub
   }
 }
 
@@ -50,5 +68,21 @@ describe('DbAddAccount usecase', () => {
     }
     const promise = sut.add(accountData)
     await expect(promise).rejects.toThrow()
+  })
+
+  test('must call AddAccountRepository with correct values', async () => {
+    const { sut, addAccountRepositoryStub } = makeSut()
+    const addSpy = jest.spyOn(addAccountRepositoryStub, 'add')
+    const accountData = {
+      name: 'valid_name',
+      password: 'valid_password',
+      email: 'valid_email@mail.com'
+    }
+    await sut.add(accountData)
+    expect(addSpy).toHaveBeenCalledWith({
+      name: 'valid_name',
+      email: 'valid_email@mail.com',
+      password: 'hashed_password'
+    })
   })
 })
