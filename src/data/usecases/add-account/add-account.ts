@@ -1,15 +1,18 @@
 // eslint-disable-next-line no-unused-vars
-import { AddAccount, AddAccountModel, Encrypter, AccountModel } from './add-account-protocols'
+import { AddAccountRepository, AddAccount, AddAccountModel, Encrypter, AccountModel } from './add-account-protocols'
 
 export class DbAddAccount implements AddAccount {
-  private readonly encrypter
+  private readonly encrypter: Encrypter
+  private readonly addAccountRepository: AddAccountRepository
 
-  constructor (encrypter: Encrypter) {
+  constructor (encrypter: Encrypter, addAccountRepository: AddAccountRepository) {
     this.encrypter = encrypter
+    this.addAccountRepository = addAccountRepository
   }
 
   async add (account: AddAccountModel): Promise<AccountModel> {
-    await this.encrypter.encrypt(account.password)
+    const hashedPassword = await this.encrypter.encrypt(account.password)
+    await this.addAccountRepository.add(Object.assign({}, account, { password: hashedPassword }))
     return new Promise(resolve => resolve(null))
   }
 }
