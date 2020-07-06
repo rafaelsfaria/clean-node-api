@@ -1,7 +1,5 @@
-/* eslint-disable no-unused-vars */
-import { AddAccount, AddAccountModel } from '../../../domain/usecases/add-account'
-import { AccountModel } from '../../../domain/models/account'
-import { Encrypter } from '../../protocols/encrypter-protocol'
+// eslint-disable-next-line no-unused-vars
+import { AddAccount, AddAccountModel, Encrypter, AccountModel } from './add-account-protocols'
 
 export class DbAddAccount implements AddAccount {
   private readonly encrypter

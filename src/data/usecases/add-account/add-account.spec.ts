@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { Encrypter } from '../../protocols/encrypter-protocol'
+import { Encrypter } from './add-account-protocols'
 import { DbAddAccount } from './add-account'
 
 interface SutTypes {
